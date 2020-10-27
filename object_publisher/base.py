@@ -61,9 +61,13 @@ class PublisherBase:
         self.deallocator = deallocator
 
     
-    @staticmethod
-    def _enumerate_published(klass):
-        
+    def _enumerate_published(self, klass):
+        overridden = klass.__dict__.keys()
         for k,v in klass.__dict__.items():
             if isinstance(v, PublishedMethod):
                 yield (k, v)
+        if len(klass.__bases__) > 0:
+            for b in klass.__bases__:
+                for k, v in self._enumerate_published(b):
+                    if k not in overridden:
+                        yield (k, v)
